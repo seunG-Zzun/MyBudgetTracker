@@ -13,7 +13,7 @@ const Stats = ({ records }) => {
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
             소비 패턴을<br />똑똑하게 분석하세요
           </h1>
-          <p className="text-xl text-gray-300 mt-6">당신의 지출을 시각화해보세요</p>
+          <p className="text-xl text-gray-300 mt-6">한눈에 보는 나의 소비 리포트</p>
         </div>
 
         <StatsChart records={records} />

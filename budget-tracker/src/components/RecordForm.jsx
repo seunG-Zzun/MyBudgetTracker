@@ -68,7 +68,7 @@ const RecordForm = ({ onAddRecord, editingRecord, onUpdateRecord, onCancelEdit }
     <form onSubmit={handleSubmit} className="glass-card p-8 mb-8">
       <h2 className="text-3xl font-bold mb-6 text-white flex items-center gap-3">
         <span className="text-4xl">📝</span>
-        {editingRecord ? '내역 수정' : '새 내역 추가'}
+        {editingRecord ? '내역 수정' : '내역 추가'}
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

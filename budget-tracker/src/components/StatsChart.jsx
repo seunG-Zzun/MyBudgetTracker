@@ -187,7 +187,7 @@ const StatsChart = ({ records }) => {
       {/* 카테고리별 지출 */}
       <div className="glass-card p-8">
         <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-          <span className="text-3xl">🍰</span>
+          <span className="text-3xl">🏷️</span>
           카테고리별 지출
         </h3>
         {categoryData.length > 0 ? (

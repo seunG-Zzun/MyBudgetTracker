@@ -20,7 +20,7 @@ const RecurringExpense = ({
   });
 
   const categories = [
-    '주거비', '통신비', '보험료', '구독서비스', '저축', '기타'
+    '교통비', '주거비', '공과금', '통신비', '보험료', '구독서비스', '저축', '기타'
   ];
 
   const handleSubmit = (e) => {
