@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Categories } from '../types';
 import { formatDate } from '../utils/formatDate';
@@ -8,10 +8,30 @@ const RecordForm = ({ onAddRecord, editingRecord, onUpdateRecord, onCancelEdit }
   const [formData, setFormData] = useState({
     type: editingRecord?.type || 'expense',
     category: editingRecord?.category || '',
-    amount: editingRecord?.amount ? String(editingRecord.amount) : '',
+    amount: editingRecord?.amount ? formatAmount(editingRecord.amount) : '',
     date: editingRecord?.date || formatDate(new Date()),
     memo: editingRecord?.memo || ''
   });
+
+  useEffect(() => {
+    if (editingRecord) {
+      setFormData({
+        type: editingRecord.type,
+        category: editingRecord.category,
+        amount: formatAmount(editingRecord.amount),
+        date: editingRecord.date,
+        memo: editingRecord.memo || ''
+      });
+    } else {
+      setFormData({
+        type: 'expense',
+        category: '',
+        amount: '',
+        date: formatDate(new Date()),
+        memo: ''
+      });
+    }
+  }, [editingRecord]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -49,6 +69,15 @@ const RecordForm = ({ onAddRecord, editingRecord, onUpdateRecord, onCancelEdit }
   const handleChange = (e) => {
     const { name, value } = e.target;
     
+    if (name === 'type') {
+      setFormData((prev) => ({
+        ...prev,
+        type: value,
+        category: ''
+      }));
+      return;
+    }
+
     // 금액 필드의 경우 천 단위 쉼표 자동 추가
     if (name === 'amount') {
       const formattedValue = formatAmount(value);
@@ -171,4 +200,3 @@ const RecordForm = ({ onAddRecord, editingRecord, onUpdateRecord, onCancelEdit }
 };
 
 export default RecordForm;
-

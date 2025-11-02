@@ -1,5 +1,52 @@
 # 🧾 **나만의 가계부 (My Budget Tracker)**
 
+## 0. 실행 방법
+
+> 제출 압축 파일을 해제하면 `MyBudgetTracker/budget-tracker` 디렉토리가 생성됩니다. 아래 명령은 **항상 이 폴더로 이동한 뒤** 실행하세요.
+
+### 사전 준비
+
+1. 필수: Node.js 18+
+   - 버전 확인: `node -v`
+   - 설치 필요 시: [https://nodejs.org](https://nodejs.org) (LTS 권장)
+
+### 설치 및 실행
+
+2. 의존성 설치
+   - macOS / Linux
+     ```bash
+     cd budget-tracker
+     npm install
+     ```
+   - Windows (PowerShell)
+     ```powershell
+     cd budget-tracker
+     npm install
+     ```
+3. 개발 서버 실행
+   - macOS / Linux
+     ```bash
+     npm run dev
+     ```
+   - Windows (PowerShell)
+     ```powershell
+     npm run dev
+     ```
+   - 브라우저에서 `http://localhost:5173` 접속
+4. 프로덕션 빌드 & 프리뷰 (선택)
+   - macOS / Linux
+     ```bash
+     npm run build
+     npm run preview
+     ```
+   - Windows (PowerShell)
+     ```powershell
+     npm run build
+     npm run preview
+     ```
+
+---
+
 ## 1. 프로젝트 개요
 
 **프로젝트명:** 나만의 가계부 (My Budget Tracker)  
@@ -41,7 +88,7 @@
 | 항목 | 기술 |
 |------|------|
 | **Framework** | React 18 (Vite 기반) |
-| **상태관리** | useState hooks |
+| **상태관리** | React Context + useReducer + 커스텀 훅 |
 | **데이터 저장소** | localStorage (budgetRecords, recurringExpenses) |
 | **시각화** | Recharts (BarChart, PieChart) |
 | **날짜 처리** | dayjs |
@@ -163,27 +210,34 @@ export const getMonthlySummary = (records, year, month) => {
 ```
 src/
  ┣ components/
- ┃ ┣ RecordForm.jsx          # 수입/지출 입력 폼 (Glass-morphism)
- ┃ ┣ RecordList.jsx          # 내역 목록 테이블
- ┃ ┣ RecordItem.jsx          # 단일 내역 컴포넌트
- ┃ ┣ FilterBar.jsx           # 카테고리/날짜 필터 (구버전)
- ┃ ┣ StatsChart.jsx          # 월별 통계 시각화
- ┃ ┗ RecurringExpense.jsx    # 고정지출 관리
- ┣ pages/
- ┃ ┣ Home.jsx                # 메인 화면 (다양한 뷰 모드 지원)
- ┃ ┗ Stats.jsx                # 통계 화면
+ ┃ ┣ dashboard/
+ ┃ ┃ ┣ SummaryCards.jsx        # 수입/지출/순계 집계 카드
+ ┃ ┃ ┗ CategorySummary.jsx     # 카테고리별 지출 진행률
+ ┃ ┣ home/
+ ┃ ┃ ┗ ViewModeControls.jsx    # 일/월/연/범위 뷰 전환 + 날짜 네비게이션
+ ┃ ┣ FilterBar.jsx             # 구분/카테고리/기간 필터
+ ┃ ┣ RecordForm.jsx            # 내역 추가/수정 폼
+ ┃ ┣ RecordList.jsx            # 내역 목록 테이블
+ ┃ ┣ RecordItem.jsx            # 단일 내역 행
+ ┃ ┣ RecurringExpense.jsx      # 고정지출 관리
+ ┃ ┗ StatsChart.jsx            # 통계 차트 (Bar/Pie)
+ ┣ context/
+ ┃ ┗ BudgetContext.jsx         # BudgetProvider + useBudget 훅
  ┣ hooks/
- ┃ ┗ useLocalStorage.js      # 데이터 저장 커스텀 훅 + 고정지출
+ ┃ ┗ useBudgetStore.js         # useReducer 기반 전역 상태/로컬스토리지 동기화
+ ┣ pages/
+ ┃ ┣ Home.jsx                  # 홈 화면 (폼/필터/대시보드/목록/고정지출)
+ ┃ ┗ Stats.jsx                 # 통계 화면
  ┣ utils/
- ┃ ┣ formatDate.js           # 날짜 포맷팅
- ┃ ┣ calculateSummary.js     # 통계 계산
- ┃ ┗ formatAmount.js         # 금액 천단위 쉼표 처리
+ ┃ ┣ formatDate.js             # 날짜 포맷팅
+ ┃ ┣ calculateSummary.js       # 통계 계산
+ ┃ ┗ formatAmount.js           # 금액 천단위 쉼표 처리
  ┣ types/
- ┃ ┗ index.js                 # Categories 정의
- ┣ App.jsx                    # 라우팅 및 전역 상태
+ ┃ ┗ index.js                  # Categories 정의
+ ┣ App.jsx                     # 네비게이션 + BudgetProvider 적용
  ┣ App.css
- ┣ index.css                  # Tailwind + Glass-morphism
- ┗ tailwind.config.js         # 커스텀 색상 (navy, orange, pink)
+ ┣ index.css                   # Tailwind + Glass-morphism
+ ┗ tailwind.config.js          # 커스텀 색상 (navy, orange, pink)
 ```
 
 ---
@@ -192,10 +246,12 @@ src/
 
 | 이벤트 | 동작 | 결과 |
 |--------|------|------|
-| 새 기록 추가 | form 입력 → onSubmit | `records` 상태 갱신 + localStorage 저장 |
-| 내역 삭제 | delete 버튼 클릭 | 해당 id 필터링 후 저장 |
-| 수정 완료 | form 재제출 | 기존 id 갱신 |
-| 월별 통계 요청 | month select 변경 | 통계 데이터 재계산 |
+| 앱 로드 | BudgetProvider → `useBudgetStore` | localStorage에서 records/recurringExpenses 복구 |
+| 새 기록 추가 | RecordForm submit → `dispatch('ADD_RECORD')` | Context 상태 갱신 + localStorage 동기화 |
+| 내역 수정 | RecordForm 재제출 → `dispatch('UPDATE_RECORD')` | 대상 id 업데이트 + 저장 |
+| 내역 삭제 | RecordItem 삭제 → `dispatch('DELETE_RECORD')` | 대상 id 제거 + 저장 |
+| 고정지출 적용 | RecurringExpense → `dispatch('ADD_RECORD')` | 선택 날짜에 지출 생성 |
+| 통계/필터 변경 | ViewModeControls/FilterBar 상태 변경 | 메모이제이션으로 파생 데이터 다시 계산 |
 
 ---
 

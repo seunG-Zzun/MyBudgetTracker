@@ -1,33 +1,32 @@
-import { useState } from 'react';
 import { Categories } from '../types';
 
-const FilterBar = ({ onFilterChange }) => {
-  const [filters, setFilters] = useState({
-    type: '',
-    category: '',
-    startDate: '',
-    endDate: ''
-  });
+const defaultFilters = {
+  type: '',
+  category: '',
+  startDate: '',
+  endDate: ''
+};
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    const newFilters = {
+const FilterBar = ({
+  filters,
+  onFilterChange,
+  availableCategories = [],
+  showDateRange = false
+}) => {
+  const categories =
+    availableCategories.length > 0
+      ? availableCategories
+      : Array.from(new Set(Object.values(Categories).flat()));
+
+  const handleChange = (name, value) => {
+    onFilterChange({
       ...filters,
       [name]: value
-    };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
+    });
   };
 
   const handleReset = () => {
-    const resetFilters = {
-      type: '',
-      category: '',
-      startDate: '',
-      endDate: ''
-    };
-    setFilters(resetFilters);
-    onFilterChange(resetFilters);
+    onFilterChange({ ...defaultFilters });
   };
 
   return (
@@ -43,9 +42,8 @@ const FilterBar = ({ onFilterChange }) => {
             구분
           </label>
           <select
-            name="type"
             value={filters.type}
-            onChange={handleChange}
+            onChange={(event) => handleChange('type', event.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all backdrop-blur-sm"
           >
             <option value="" className="bg-navy-800">전체</option>
@@ -59,13 +57,12 @@ const FilterBar = ({ onFilterChange }) => {
             카테고리
           </label>
           <select
-            name="category"
             value={filters.category}
-            onChange={handleChange}
+            onChange={(event) => handleChange('category', event.target.value)}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all backdrop-blur-sm"
           >
             <option value="" className="bg-navy-800">전체</option>
-            {Object.values(Categories).flat().filter((cat, index, self) => self.indexOf(cat) === index).map(cat => (
+            {categories.map(cat => (
               <option key={cat} value={cat} className="bg-navy-800">{cat}</option>
             ))}
           </select>
@@ -77,10 +74,10 @@ const FilterBar = ({ onFilterChange }) => {
           </label>
           <input
             type="date"
-            name="startDate"
             value={filters.startDate}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all backdrop-blur-sm"
+            onChange={(event) => handleChange('startDate', event.target.value)}
+            disabled={!showDateRange}
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all backdrop-blur-sm disabled:opacity-40"
           />
         </div>
 
@@ -90,10 +87,10 @@ const FilterBar = ({ onFilterChange }) => {
           </label>
           <input
             type="date"
-            name="endDate"
             value={filters.endDate}
-            onChange={handleChange}
-            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all backdrop-blur-sm"
+            onChange={(event) => handleChange('endDate', event.target.value)}
+            disabled={!showDateRange}
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all backdrop-blur-sm disabled:opacity-40"
           />
         </div>
       </div>
@@ -111,6 +108,4 @@ const FilterBar = ({ onFilterChange }) => {
 };
 
 export default FilterBar;
-
-
 

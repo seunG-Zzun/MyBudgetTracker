@@ -1,6 +1,9 @@
 import StatsChart from '../components/StatsChart';
+import { useBudget } from '../context/BudgetContext';
 
-const Stats = ({ records }) => {
+const Stats = () => {
+  const { records } = useBudget();
+
   return (
     <div className="relative py-8">
       {/* Decorative Background Elements */}
@@ -23,6 +26,5 @@ const Stats = ({ records }) => {
 };
 
 export default Stats;
-
 
 
